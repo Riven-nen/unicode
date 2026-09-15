@@ -16,6 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const disposable = vscode.commands.registerCommand(
 		'unicode.getStarted', 
 		() => {
+			vscode.window.showInformationMessage("get Started ran");
 			createUnicodeWebview(context);
 		}
 	);

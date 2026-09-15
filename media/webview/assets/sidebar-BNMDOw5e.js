@@ -1,1 +1,0 @@
-import{n as e,t}from"./jsx-runtime-BiKoKiBg.js";var n=e(),r=t();function i(){return(0,r.jsx)(`h1`,{children:`Sidebar here`})}(0,n.createRoot)(document.getElementById(`root`)).render((0,r.jsx)(i,{}));

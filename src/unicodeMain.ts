@@ -2,13 +2,14 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-export function createUnicodeWebview(context : vscode.ExtensionContext) {
-
+export function createUnicodeWebview(context: vscode.ExtensionContext) {
     const panel = vscode.window.createWebviewPanel(
         'unicode-main',
         'Unicode',
         vscode.ViewColumn.One,
-        {}
+        {
+            enableScripts: true
+        }
     );
 
     const assetsUri = panel.webview.asWebviewUri(
@@ -29,7 +30,11 @@ export function createUnicodeWebview(context : vscode.ExtensionContext) {
     );
 
     let html = fs.readFileSync(htmlPath, 'utf-8');
-    html = html.replace("/assets/", `${assetsUri.toString()}/`);
+
+    html = html.replaceAll(
+        '/assets/',
+        `${assetsUri.toString()}/`
+    );
 
     panel.webview.html = html;
 

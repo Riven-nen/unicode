@@ -1,7 +1,8 @@
 function App() {
     return (
-        <div>
-            
+        <div className="main-content">
+            <h1>Unicode</h1>
+            <button>Sign in with Google</button>
         </div>
     )
 }

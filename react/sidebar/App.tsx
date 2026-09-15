@@ -1,7 +1,6 @@
+const vscode = acquireVsCodeApi();
 function App() {
     const handleGetStarted = () => {
-        const vscode = acquireVsCodeApi()
-
         vscode.postMessage({
             type: "getStarted"
         })

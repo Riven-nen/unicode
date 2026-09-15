@@ -2,8 +2,15 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
+let unicodePanel: vscode.WebviewPanel | undefined;
+
 export function createUnicodeWebview(context: vscode.ExtensionContext) {
-    const panel = vscode.window.createWebviewPanel(
+    if (unicodePanel) {
+        unicodePanel.reveal(vscode.ViewColumn.One);
+        return unicodePanel;
+    }
+
+    unicodePanel = vscode.window.createWebviewPanel(
         'unicode-main',
         'Unicode',
         vscode.ViewColumn.One,
@@ -12,7 +19,7 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
         }
     );
 
-    const assetsUri = panel.webview.asWebviewUri(
+    const assetsUri = unicodePanel.webview.asWebviewUri(
         vscode.Uri.joinPath(
             context.extensionUri,
             'media',
@@ -36,7 +43,11 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
         `${assetsUri.toString()}/`
     );
 
-    panel.webview.html = html;
+    unicodePanel.webview.html = html;
 
-    return panel;
+    unicodePanel.onDidDispose(() => {
+        unicodePanel = undefined;
+    });
+
+    return unicodePanel;
 }

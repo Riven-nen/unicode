@@ -1,0 +1,1 @@
+import{n as e,t}from"./jsx-runtime-DNGSKNfW.js";var n=e(),r=t(),i=acquireVsCodeApi();function a(){return(0,r.jsxs)(`div`,{children:[(0,r.jsx)(`h1`,{children:`Welcome to Unicode`}),(0,r.jsx)(`button`,{onClick:()=>{i.postMessage({type:`getStarted`})},children:`Get Started`})]})}(0,n.createRoot)(document.getElementById(`root`)).render((0,r.jsx)(a,{}));

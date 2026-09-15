@@ -14,11 +14,36 @@
   "contributes": {
     "commands": [
       {
-        "command": "unicode.helloWorld",
-        "title": "Hello World"
+        "command": "unicode.startWebview",
+        "title": "Start Webview"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "unicode-icon",
+          "title": "Unicode",
+          "icon": "code"
+        }
+      ]
+    },
+    "views": {
+        "unicode-icon": [
+            {
+                "type": "webview",
+                "id": "unicode-main",
+                "name": "Unicode",
+                "icon": ""
+            },
+            {
+                "id": "package-outline",
+                "name": "Outline",
+                "icon": "list-tree"
+            }
+        ]
+    }
   },
+
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",

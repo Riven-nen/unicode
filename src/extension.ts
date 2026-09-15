@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { UnicodeViewProvider } from './unicodeView';
-import { createUnicodeWebview } from './unicodePanel';
+import { UnicodeViewProvider } from './unicodeSidebar';
+import { createUnicodeWebview } from './unicodeMain';
 
 export function activate(context: vscode.ExtensionContext) {
 

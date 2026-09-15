@@ -7,14 +7,19 @@ export class UnicodeViewProvider implements vscode.WebviewViewProvider {
     constructor(
         private readonly context : vscode.ExtensionContext
     ) {}
-    // hardcoded for now because i dont think i will reuse this?
+
     resolveWebviewView(webviewView: vscode.WebviewView) {
-        const scriptUri = webviewView.webview.asWebviewUri(
+
+        webviewView.webview.options = {
+            enableScripts : true
+        };
+
+        const assetsUri = webviewView.webview.asWebviewUri(
             vscode.Uri.joinPath(
                 this.context.extensionUri,
                 'media',
-                'js',
-                'webviewView.js'
+                'webview',
+                'assets'
             )        
         );
 
@@ -25,13 +30,14 @@ export class UnicodeViewProvider implements vscode.WebviewViewProvider {
         const htmlPath = path.join(
             this.context.extensionPath,
             'media',
-            'html',
-            'webviewView.html'
+            'webview',
+            'sidebar',
+            'index.html'
         );
 
         let html = fs.readFileSync(htmlPath, 'utf-8');
 
-        html = html.replace("SCRIPT_URI", scriptUri.toString());
+        html = html.replaceAll("/assets/", `${assetsUri.toString()}/`);
 
         webviewView.webview.html = html;
 

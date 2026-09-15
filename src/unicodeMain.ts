@@ -3,12 +3,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 export function createUnicodeWebview(context : vscode.ExtensionContext) {
-    const stylePath = vscode.Uri.joinPath(
-        context.extensionUri,
-        'media',
-        'css',
-        'index.css'
-    );
 
     const panel = vscode.window.createWebviewPanel(
         'unicode-main',
@@ -17,15 +11,25 @@ export function createUnicodeWebview(context : vscode.ExtensionContext) {
         {}
     );
 
+    const assetsUri = panel.webview.asWebviewUri(
+        vscode.Uri.joinPath(
+            context.extensionUri,
+            'media',
+            'webview',
+            'assets'
+        )
+    );
+
     const htmlPath = path.join(
         context.extensionPath,
         'media',
-        'html',
+        'webview',
+        'main',
         'index.html'
     );
 
-    const html = fs.readFileSync(htmlPath, 'utf-8');
-    html.replace("STYLE_URI","");
+    let html = fs.readFileSync(htmlPath, 'utf-8');
+    html = html.replace("/assets/", `${assetsUri.toString()}/`);
 
     panel.webview.html = html;
 

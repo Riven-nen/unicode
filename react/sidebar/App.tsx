@@ -1,15 +1,9 @@
-const vscode = acquireVsCodeApi();
-function App() {
-    const handleGetStarted = () => {
-        vscode.postMessage({
-            type: "getStarted"
-        })
-    }
+import Landing from './tsx/Landing'
 
+function App() {
     return (
         <div>
-            <h1>Welcome to Unicode</h1>
-            <button onClick={handleGetStarted}>Get Started</button>
+            <Landing/>
         </div>
     )
 }

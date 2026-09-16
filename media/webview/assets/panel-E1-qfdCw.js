@@ -1,1 +1,0 @@
-import{n as e,t}from"./jsx-runtime-DNGSKNfW.js";var n=e(),r=t();function i(){return(0,r.jsxs)(`div`,{className:`main-content`,children:[(0,r.jsx)(`h1`,{children:`Unicode`}),(0,r.jsx)(`button`,{children:`Sign in with Google`})]})}(0,n.createRoot)(document.getElementById(`root`)).render((0,r.jsx)(i,{}));

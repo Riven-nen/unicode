@@ -1,0 +1,84 @@
+.landing-main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 300px;
+    min-height: 100%;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.landing-logo {
+    width: 240px;
+    max-width: 75%;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 28px;
+}
+
+.landing-main-container h1 {
+    margin: 0;
+    color: var(--vscode-foreground);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.landing-subtitle {
+    max-width: 420px;
+    margin: 12px 0 28px;
+    color: var(--vscode-descriptionForeground);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+#sign-in-google {
+    width: 240px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 18px;
+    box-sizing: border-box;
+    background: #ffffff;
+    color: #202124;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+#sign-in-google:hover {
+    background: #f8faff;
+    border-color: #4285f4;
+    box-shadow: 0 3px 8px rgba(66, 133, 244, 0.28);
+    transform: translateY(-2px);
+}
+
+#sign-in-google:active {
+    background: #eef3f8;
+    border-color: #1a73e8;
+    box-shadow: 0 1px 3px rgba(66, 133, 244, 0.2);
+    transform: translateY(0);
+}
+
+#sign-in-google:focus-visible {
+    outline: 2px solid #4285f4;
+    outline-offset: 3px;
+}
+
+.landing-note {
+    max-width: 360px;
+    margin: 18px 0 0;
+    color: var(--vscode-descriptionForeground);
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.85;
+}

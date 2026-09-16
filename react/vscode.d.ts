@@ -3,3 +3,7 @@ declare function acquireVsCodeApi(): {
     getState(): unknown
     setState(state: unknown): void
 }
+
+declare module '*.css'
+
+declare module '*.png'

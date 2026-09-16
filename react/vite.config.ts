@@ -6,11 +6,12 @@ export default defineConfig({
     build: {
         rollupOptions: {
             input: {
-                sidebar: 'sidebar/index.html',
-                panel: 'main/index.html'
+                main: 'main/index.html',
+                sidebar: 'sidebar/index.html'
             }
         },
         outDir: '../media/webview',
-        emptyOutDir: true
+        emptyOutDir: true,
+        assetsInlineLimit: Infinity
     }
 });

@@ -34,11 +34,6 @@
           "id": "unicode-main",
           "name": "Unicode",
           "icon": ""
-        },
-        {
-          "id": "package-outline",
-          "name": "Outline",
-          "icon": "list-tree"
         }
       ]
     }

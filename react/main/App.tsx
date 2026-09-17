@@ -1,9 +1,9 @@
-import Landing from './tsx/Landing'
+import Login from './tsx/Login'
 
 function App() {
     return (
         <div className="main-content">
-            <Landing/>
+            <Login/>
         </div>
     )
 }

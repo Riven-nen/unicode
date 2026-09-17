@@ -1,8 +1,8 @@
-import '../css/Landing.css';
+import '../css/Login.css';
 
 const vscode = acquireVsCodeApi();
 
-function Landing() {
+function Login() {
     const handleGetStarted = () => {
         vscode.postMessage({
             type: "getStarted"
@@ -18,4 +18,4 @@ function Landing() {
     );
 }
 
-export default Landing;
+export default Login;

@@ -11,18 +11,13 @@ export function activate(context: vscode.ExtensionContext) {
 		unicodeViewProvider
 	);
 
-	console.log('Congratulations, your extension "unicode" is now active!');
-
-	const disposable = vscode.commands.registerCommand(
-		'unicode.getStarted', 
-		() => {
+	context.subscriptions.push(
+		vscode.commands.registerCommand('unicode.getStarted', () => {
 			createUnicodeWebview(context);
 		}
-	);
+	));
 
 	
-
-	context.subscriptions.push(disposable);
 }
 
 export function deactivate() {}

@@ -1,19 +1,36 @@
 import * as vscode from 'vscode';
 
-// Cached in memory; persisted in context.globalState.
 let currentUser: UserProfile | null = null;
-
-// Runtime-only references — never persisted.
+let currentCourses: GoogleCourse[] = [];
+let currentCourse: GoogleCourse | null = null;
+let currentCoursework: GoogleCourseWork[] = [];
 let sidebarView: vscode.WebviewView | undefined;
 let mainPanel: vscode.WebviewPanel | undefined;
-
-// Stashed here so callers don't have to pass context around.
 let ctx: vscode.ExtensionContext | undefined;
 
 export type UserProfile = {
     name: string;
     role: 'Student' | 'Teacher';
     userId: string;
+    picture?: string;
+};
+
+export type GoogleCourse = {
+    id: string;
+    name: string;
+    section?: string;
+    room?: string;
+    ownerId?: string;
+};
+
+export type GoogleCourseWork = {
+    id: string;
+    title: string;
+    description?: string;
+    dueDate?: { year: number; month: number; day: number };
+    dueTime?: { hours: number; minutes: number };
+    state?: string;
+    alternateLink?: string;
 };
 
 const USER_KEY = 'unicode.user';
@@ -36,15 +53,42 @@ export function getUser(): UserProfile | null {
 }
 
 export async function setUser(user: UserProfile | null) {
-    if (!ctx) {
-        throw new Error('setUser called before initUser');
-    }
-
+    if (!ctx) throw new Error('setUser called before initUser');
     currentUser = user;
-
     await ctx.globalState.update(USER_KEY, user ?? undefined);
-
     const payload = { type: 'authState', user };
     sidebarView?.webview.postMessage(payload);
+    mainPanel?.webview.postMessage(payload);
+}
+
+export function getCourses(): GoogleCourse[] {
+    return currentCourses;
+}
+
+export function setCourses(courses: GoogleCourse[]) {
+    currentCourses = courses;
+    const payload = { type: 'courses', courses };
+    sidebarView?.webview.postMessage(payload);
+    mainPanel?.webview.postMessage(payload);
+}
+
+export function getCurrentCourse(): GoogleCourse | null {
+    return currentCourse;
+}
+
+export function setCurrentCourse(course: GoogleCourse | null) {
+    currentCourse = course;
+    const payload = { type: 'currentCourse', course };
+    sidebarView?.webview.postMessage(payload);
+    mainPanel?.webview.postMessage(payload);
+}
+
+export function getCoursework(): GoogleCourseWork[] {
+    return currentCoursework;
+}
+
+export function setCoursework(coursework: GoogleCourseWork[]) {
+    currentCoursework = coursework;
+    const payload = { type: 'coursework', coursework };
     mainPanel?.webview.postMessage(payload);
 }

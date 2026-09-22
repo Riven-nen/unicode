@@ -3,11 +3,8 @@ import '../css/Login.css';
 import { vscode } from '../../vscodeApi';
 
 function Login() {
-    const handleLogin = () => { // TODO: Not hardcode this
-        vscode.postMessage({
-            type: 'loginSuccess',
-            user: "user"
-        });
+    const handleLogin = () => {
+        vscode.postMessage({ type: 'login' });
     };
 
     return (

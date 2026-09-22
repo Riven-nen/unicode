@@ -1,46 +1,132 @@
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+}
+
 .sidebar-container {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     box-sizing: border-box;
+    background: var(--vscode-sideBar-background);
+    overflow: hidden;
+    color: var(--vscode-foreground);
+    font-family: var(--vscode-font-family);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 14px 12px;
+    border-bottom: 1px solid var(--vscode-sideBar-border, rgba(255, 255, 255, 0.06));
     background: var(--vscode-sideBar-background);
 }
 
+.sidebar-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+    display: block;
+}
+
+.sidebar-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4285F4, #34A853);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.sidebar-user {
+    min-width: 0;
+    flex: 1;
+}
+
+.sidebar-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--vscode-foreground);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-user-role {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--vscode-descriptionForeground);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+}
+
 .sidebar-top {
-    padding: 14px 10px;
+    padding: 14px 10px 8px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.sidebar-top::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar-top::-webkit-scrollbar-thumb {
+    background: var(--vscode-scrollbarSlider-background);
+    border-radius: 4px;
+}
+
+.sidebar-top::-webkit-scrollbar-thumb:hover {
+    background: var(--vscode-scrollbarSlider-hoverBackground);
 }
 
 .sidebar-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 8px 10px;
+    padding: 0 6px 10px;
     color: var(--vscode-descriptionForeground);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    user-select: none;
 }
 
 .sidebar-count {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
-    height: 20px;
+    min-width: 18px;
+    height: 18px;
     padding: 0 6px;
     box-sizing: border-box;
-    border-radius: 10px;
+    border-radius: 9px;
     background: var(--vscode-badge-background);
     color: var(--vscode-badge-foreground);
     font-size: 10px;
+    font-weight: 700;
     letter-spacing: normal;
 }
 
 .sidebar-subjects {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
 }
 
 .sidebar-subject {
@@ -48,89 +134,109 @@
     display: flex;
     align-items: center;
     width: 100%;
-    min-height: 38px;
+    min-height: 36px;
     padding: 0 10px;
     box-sizing: border-box;
-    border: 1px solid transparent;
-    border-radius: 6px;
+    border: none;
+    border-left: 2px solid transparent;
+    border-radius: 4px;
     background: transparent;
     color: var(--vscode-foreground);
     font-family: inherit;
     font-size: 13px;
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
+    transition: background-color 0.1s ease, border-color 0.1s ease;
 }
 
 .sidebar-subject:hover {
     background: var(--vscode-list-hoverBackground);
-    border-color: var(--vscode-widget-border);
 }
 
 .sidebar-subject.active {
     background: var(--vscode-list-activeSelectionBackground);
     color: var(--vscode-list-activeSelectionForeground);
-    border-color: var(--vscode-list-focusAndSelectionOutline);
-}
-
-.sidebar-subject.active:hover {
-    background: var(--vscode-list-activeSelectionBackground);
+    border-left-color: var(--course-color, var(--vscode-textLink-foreground));
 }
 
 .subject-indicator {
-    width: 6px;
-    height: 6px;
-    margin-right: 11px;
+    width: 8px;
+    height: 8px;
+    margin-right: 10px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: var(--vscode-descriptionForeground);
-    opacity: 0.65;
+    background: var(--course-color, var(--vscode-descriptionForeground));
+    opacity: 0.9;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.sidebar-subject:hover .subject-indicator {
+    transform: scale(1.15);
 }
 
 .sidebar-subject.active .subject-indicator {
-    background: var(--vscode-textLink-foreground);
-    opacity: 1;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--vscode-textLink-foreground) 15%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--course-color, var(--vscode-textLink-foreground)) 25%, transparent);
 }
 
 .subject-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: 400;
+}
+
+.sidebar-subject.active .subject-name {
+    font-weight: 500;
 }
 
 .sidebar-footer {
-    margin-top: auto;
-    padding: 8px;
-    border-top: 1px solid var(--vscode-sideBar-border);
+    flex-shrink: 0;
+    padding: 6px 8px 10px;
+    border-top: 1px solid var(--vscode-sideBar-border, rgba(255, 255, 255, 0.06));
+    background: var(--vscode-sideBar-background);
 }
 
-.sidebar-settings {
+.sidebar-settings,
+.sidebar-logout {
     display: flex;
     align-items: center;
     gap: 10px;
     width: 100%;
-    min-height: 36px;
+    min-height: 32px;
     padding: 0 10px;
     box-sizing: border-box;
-    border: 1px solid transparent;
-    border-radius: 6px;
+    border: none;
+    border-radius: 5px;
     background: transparent;
     color: var(--vscode-descriptionForeground);
     font-family: inherit;
     font-size: 12px;
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.sidebar-logout {
+    margin-top: 2px;
 }
 
 .sidebar-settings:hover {
     background: var(--vscode-list-hoverBackground);
     color: var(--vscode-foreground);
-    border-color: var(--vscode-widget-border);
+}
+
+.sidebar-logout:hover {
+    background: color-mix(in srgb, var(--vscode-errorForeground) 12%, transparent);
+    color: var(--vscode-errorForeground);
 }
 
 .settings-icon {
-    font-size: 14px;
-    opacity: 0.8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 13px;
+    opacity: 0.9;
+    flex-shrink: 0;
 }

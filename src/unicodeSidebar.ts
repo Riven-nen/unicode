@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { registerSidebar, getUser } from './state';
+import { registerSidebar, getUser, getCourses } from './state';
 
 export class UnicodeViewProvider implements vscode.WebviewViewProvider {
     constructor(private readonly context: vscode.ExtensionContext) {}
@@ -28,15 +28,24 @@ export class UnicodeViewProvider implements vscode.WebviewViewProvider {
             if (message.type === 'startWebview') {
                 vscode.commands.executeCommand('unicode.startWebview');
             }
+            if (message.type === 'login') {
+                vscode.commands.executeCommand('unicode.login');
+            }
+            if (message.type === 'logout') {
+                vscode.commands.executeCommand('unicode.logout');
+            }
+            if (message.type === 'openSubject') {
+                vscode.commands.executeCommand('unicode.openCourse', message.courseId);
+            }
             if (message.type === 'ready') {
-                console.log('[unicode] replying with user:', getUser());
                 webviewView.webview.postMessage({
                     type: 'authState',
                     user: getUser()
                 });
-            }
-            if (message.type === 'logout') {
-                vscode.commands.executeCommand('unicode.logout');
+                webviewView.webview.postMessage({
+                    type: 'courses',
+                    courses: getCourses()
+                });
             }
         });
 

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { registerMainPanel, setUser, getUser } from './state';
+import { registerMainPanel, getUser, getCurrentCourse, getCoursework } from './state';
 
 let unicodePanel: vscode.WebviewPanel | undefined;
 
@@ -36,8 +36,22 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
     const panel = unicodePanel;
 
     panel.webview.onDidReceiveMessage(message => {
-        if (message.type === 'loginSuccess') {
-            vscode.commands.executeCommand('unicode.fakeLogin'); 
+        if (message.type === 'login') {
+            vscode.commands.executeCommand('unicode.login');
+        }
+        if (message.type === 'ready') {
+            panel.webview.postMessage({
+                type: 'authState',
+                user: getUser()
+            });
+            panel.webview.postMessage({
+                type: 'currentCourse',
+                course: getCurrentCourse()
+            });
+            panel.webview.postMessage({
+                type: 'coursework',
+                coursework: getCoursework()
+            });
         }
     });
 

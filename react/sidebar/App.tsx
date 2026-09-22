@@ -6,7 +6,7 @@ import { vscode } from '../vscodeApi';
 type UserProfile = {
     name: string;
     role: 'Student' | 'Teacher';
-    userId: number;
+    userId: string;
 };
 
 function App() {

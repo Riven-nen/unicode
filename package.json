@@ -1,5 +1,6 @@
 {
   "name": "unicode",
+  "publisher": "rivencode",
   "displayName": "Unicode",
   "description": "A Virtual Classroom integrated with VS Code solution.",
   "version": "0.0.1",
@@ -13,18 +14,10 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "unicode.startWebview",
-        "title": "Start Webview"
-      },
-      {
-        "command": "unicode.fakeLogin",
-        "title": "debug login"
-      },
-      {
-        "command": "unicode.logout",
-        "title": "logout"
-      }
+      { "command": "unicode.startWebview", "title": "Start Webview" },
+      { "command": "unicode.fakeLogin", "title": "debug login" },
+      { "command": "unicode.logout", "title": "logout" },
+      { "command": "unicode.login", "title": "Unicode: Sign In" }
     ],
     "viewsContainers": {
       "activitybar": [
@@ -44,7 +37,8 @@
           "icon": ""
         }
       ]
-    }
+    },
+    "uriHandler": "unicode.auth"
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

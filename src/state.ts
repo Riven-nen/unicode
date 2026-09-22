@@ -7,13 +7,15 @@ let currentUser: UserProfile | null = null;
 let sidebarView: vscode.WebviewView | undefined;
 let mainPanel: vscode.WebviewPanel | undefined;
 
+// Stashed here so callers don't have to pass context around.
+let ctx: vscode.ExtensionContext | undefined;
+
 export type UserProfile = {
     name: string;
     role: 'Student' | 'Teacher';
-    userId: number;
+    userId: string;
 };
 
-// Key used to namespace our entry in globalState.
 const USER_KEY = 'unicode.user';
 
 export function registerSidebar(view: vscode.WebviewView | undefined) {
@@ -25,6 +27,7 @@ export function registerMainPanel(panel: vscode.WebviewPanel | undefined) {
 }
 
 export function initUser(context: vscode.ExtensionContext) {
+    ctx = context;
     currentUser = context.globalState.get<UserProfile | null>(USER_KEY, null);
 }
 
@@ -32,17 +35,14 @@ export function getUser(): UserProfile | null {
     return currentUser;
 }
 
-/**
- * Sets the user, persists to globalState, and broadcasts to live webviews.
- * Pass null to log out.
- */
-export async function setUser(
-    user: UserProfile | null,
-    context: vscode.ExtensionContext
-) {
+export async function setUser(user: UserProfile | null) {
+    if (!ctx) {
+        throw new Error('setUser called before initUser');
+    }
+
     currentUser = user;
 
-    await context.globalState.update(USER_KEY, user ?? undefined);
+    await ctx.globalState.update(USER_KEY, user ?? undefined);
 
     const payload = { type: 'authState', user };
     sidebarView?.webview.postMessage(payload);

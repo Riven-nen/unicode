@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { registerSidebar, setUser, getUser } from './state';
+import { registerSidebar, getUser } from './state';
 
 export class UnicodeViewProvider implements vscode.WebviewViewProvider {
     constructor(private readonly context: vscode.ExtensionContext) {}
@@ -25,14 +25,18 @@ export class UnicodeViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.html = html;
 
         webviewView.webview.onDidReceiveMessage(message => {
-            if (message.type === 'getStarted') {
-                vscode.commands.executeCommand('unicode.getStarted');
+            if (message.type === 'startWebview') {
+                vscode.commands.executeCommand('unicode.startWebview');
             }
             if (message.type === 'ready') {
+                console.log('[unicode] replying with user:', getUser());
                 webviewView.webview.postMessage({
                     type: 'authState',
                     user: getUser()
                 });
+            }
+            if (message.type === 'logout') {
+                vscode.commands.executeCommand('unicode.logout');
             }
         });
 

@@ -1,7 +1,6 @@
 import Logo from '../../pics/logo-white.png';
 import '../css/Login.css';
-
-const vscode = acquireVsCodeApi();
+import { vscode } from '../../vscodeApi';
 
 function Login() {
     const handleLogin = () => { // TODO: Not hardcode this

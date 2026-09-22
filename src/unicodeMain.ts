@@ -37,7 +37,7 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
 
     panel.webview.onDidReceiveMessage(message => {
         if (message.type === 'loginSuccess') {
-            setUser(message.user); // broadcasts to both webviews
+            vscode.commands.executeCommand('unicode.fakeLogin'); 
         }
     });
 

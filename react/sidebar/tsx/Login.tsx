@@ -1,11 +1,11 @@
 import '../css/Login.css';
 
-const vscode = acquireVsCodeApi();
+import { vscode } from '../../vscodeApi';
 
 function Login() {
-    const handleGetStarted = () => {
+    const handleStartWebview= () => {
         vscode.postMessage({
-            type: "getStarted"
+            type: "startWebview"
         });
     };
 
@@ -13,7 +13,7 @@ function Login() {
         <div className="sidebar-landing">
             <h1>Welcome to Unicode</h1>
             <p>Access your virtual classroom directly from VS Code.</p>
-            <button onClick={handleGetStarted}>Get Started</button>
+            <button onClick={handleStartWebview}>Get Started</button>
         </div>
     );
 }

@@ -16,6 +16,14 @@
       {
         "command": "unicode.startWebview",
         "title": "Start Webview"
+      },
+      {
+        "command": "unicode.fakeLogin",
+        "title": "debug login"
+      },
+      {
+        "command": "unicode.logout",
+        "title": "logout"
       }
     ],
     "viewsContainers": {

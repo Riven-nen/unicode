@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import '../css/Sidebar.css';
+import { vscode } from '../../vscodeApi';
 
 function Sidebar() {
     const [selectedSubject, setSelectedSubject] = useState('Programming 1');
+
+    const handleLogout = () => {
+        vscode.postMessage({type: 'logout'});
+    }
+
     // hardcoded for now
     const subjects = [
         'Programming 1',
@@ -41,6 +47,12 @@ function Sidebar() {
                 <button className="sidebar-settings">
                     <span className="settings-icon">⚙</span>
                     <span>Settings</span>
+                </button>
+                <button 
+                    className="sidebar-logout"
+                    onClick={handleLogout}
+                >
+                    Logout
                 </button>
             </div>
         </div>

@@ -7,6 +7,8 @@ type UserProfile = {
     name: string;
     role: 'Student' | 'Teacher';
     userId: string;
+    picture?: string;
+    email: string;
 };
 
 type GoogleCourse = {
@@ -126,8 +128,14 @@ function App() {
                                 <div className="coursework-body">
                                     <div className="coursework-title">{cw.title}</div>
                                     <div className="coursework-due">
-                                        <span className="due-label">Due</span>
-                                        <span>{formatDue(cw)}</span>
+                                        {cw.dueDate ? (
+                                            <>
+                                                <span className="due-label">Due</span>
+                                                <span>{formatDue(cw)}</span>
+                                            </>
+                                        ) : (
+                                            <span>No due date</span>
+                                        )}
                                     </div>
                                     {cw.description && (
                                         <div className="coursework-desc">{cw.description}</div>
@@ -148,6 +156,11 @@ type AssignmentDetailProps = {
 };
 
 function AssignmentDetail({ coursework, onBack }: AssignmentDetailProps) {
+    const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [progress, setProgress] = useState('');
+    const [error, setError] = useState('');
+
     const handleOpenInClassroom = () => {
         if (coursework.alternateLink) {
             vscode.postMessage({
@@ -156,6 +169,35 @@ function AssignmentDetail({ coursework, onBack }: AssignmentDetailProps) {
             });
         }
     };
+
+    useEffect(() => {
+        const handler = (event: MessageEvent) => {
+            const msg = event.data;
+            if (msg.courseWorkId !== coursework.id) return;
+
+            if (msg.type === 'submitted') {
+                setSubmitted(true);
+                setSubmitting(false);
+                setProgress('');
+            }
+            if (msg.type === 'submitFailed') {
+                setSubmitting(false);
+                setProgress('');
+                setError(msg.error ?? 'Submission failed.');
+            }
+            if (msg.type === 'submitProgress') {
+                const labels: Record<string, string> = {
+                    preparing: 'Preparing...',
+                    uploading: 'Uploading...',
+                    attaching: 'Attaching...',
+                    turningIn: 'Turning in...'
+                };
+                setProgress(labels[msg.stage] ?? 'Submitting...');
+            }
+        };
+        window.addEventListener('message', handler);
+        return () => window.removeEventListener('message', handler);
+    }, [coursework.id]);
 
     const materials = coursework.materials ?? [];
 
@@ -168,7 +210,7 @@ function AssignmentDetail({ coursework, onBack }: AssignmentDetailProps) {
                 <h1 className="assignment-title">{coursework.title}</h1>
                 <div className="assignment-meta">
                     <span className="assignment-due">
-                        Due {formatDue(coursework)}
+                        {coursework.dueDate ? `Due ${formatDue(coursework)}` : 'No due date'}
                     </span>
                     {coursework.state && (
                         <span className="assignment-state">{coursework.state}</span>
@@ -278,24 +320,47 @@ function AssignmentDetail({ coursework, onBack }: AssignmentDetailProps) {
             </div>
 
             <footer className="assignment-footer">
-                <button
-                    className="assignment-secondary"
-                    onClick={handleOpenInClassroom}
-                    disabled={!coursework.alternateLink}
-                >
-                    Open in Classroom
-                </button>
-                <button
-                    className="assignment-primary"
-                    onClick={() => {
-                        vscode.postMessage({
-                            type: 'openInWorkspace',
-                            coursework
-                        });
-                    }}
-                >
-                    Open in Workspace
-                </button>
+                <div className="assignment-footer-actions">
+                    <button
+                        className="assignment-link"
+                        onClick={handleOpenInClassroom}
+                        disabled={!coursework.alternateLink}
+                    >
+                        Open in Classroom ↗
+                    </button>
+                    <button
+                        className="assignment-secondary"
+                        onClick={() => {
+                            vscode.postMessage({
+                                type: 'openInWorkspace',
+                                coursework
+                            });
+                        }}
+                    >
+                        Open in Workspace
+                    </button>
+                    <button
+                        className="assignment-primary"
+                        onClick={() => {
+                            setError('');
+                            setSubmitting(true);
+                            setProgress('Preparing...');
+                            vscode.postMessage({
+                                type: 'submitAssignment',
+                                courseWorkId: coursework.id
+                            });
+                        }}
+                        disabled={submitted || submitting}
+                    >
+                        {submitted ? 'Submitted ✓' : submitting ? progress : 'Submit'}
+                    </button>
+                </div>
+
+                {error && (
+                    <div className="assignment-error">
+                        {error}
+                    </div>
+                )}
             </footer>
         </div>
     );

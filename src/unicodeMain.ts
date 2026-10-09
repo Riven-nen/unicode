@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { registerMainPanel, getUser, getCurrentCourse, getCoursework } from './state';
-import { openAssignmentInWorkspace } from './workspace';
+import { registerMainPanel, getUser, getCurrentCourse, getCoursework, getLinkedAssignments } from './state';
+import { openAssignmentInWorkspace, packageAssignment } from './workspace';
+import {fetchSubmission, submitAssignment} from './classroom';
+
 
 let unicodePanel: vscode.WebviewPanel | undefined;
 
@@ -55,7 +57,15 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
             });
         }
         if (message.type === 'openExternal') {
-            vscode.env.openExternal(vscode.Uri.parse(message.url));
+            let url = message.url;
+            const user = getUser();
+
+            if (user?.email && !url.includes('authuser=')) {
+                const sep = url.includes('?') ? '&' : '?';
+                url = `${url}${sep}authuser=${encodeURIComponent(user.email)}`;
+            }
+
+            vscode.env.openExternal(vscode.Uri.parse(url));
         }
 
         if (message.type === 'openInWorkspace') {
@@ -65,6 +75,67 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
                 return;
             }
             await openAssignmentInWorkspace(context, course, message.coursework);
+        }
+
+        if (message.type === 'submitAssignment') {
+            const course = getCurrentCourse();
+            if (!course) {
+                vscode.window.showErrorMessage('Unicode: No course selected.');
+                return;
+            }
+
+            const coursework = getCoursework().find(cw => cw.id === message.courseWorkId);
+            if (!coursework) {
+                vscode.window.showErrorMessage('Unicode: Assignment not found.');
+                return;
+            }
+
+            const linked = getLinkedAssignments(context).find(
+                a => a.courseWorkId === message.courseWorkId
+            );
+            if (!linked) {
+                vscode.window.showWarningMessage(
+                    'Unicode: Open this assignment in a workspace first before submitting.'
+                );
+                return;
+            }
+
+            try {
+                panel.webview.postMessage({ type: 'submitProgress', stage: 'preparing' });
+
+                const submission = await fetchSubmission(course.id, coursework.id);
+                if (!submission) {
+                    throw new Error('Could not find your submission record for this assignment.');
+                }
+
+                const packaged = await packageAssignment(linked.folderPath, coursework.title);
+                if (!packaged) {
+                    throw new Error('No files found to submit.');
+                }
+
+                panel.webview.postMessage({ type: 'submitProgress', stage: 'uploading' });
+                await submitAssignment(course.id, coursework.id, submission.id, packaged);
+
+                panel.webview.postMessage({
+                    type: 'submitted',
+                    courseWorkId: coursework.id
+                });
+
+                vscode.window.showInformationMessage(
+                    `Unicode: Submitted "${coursework.title}" ✓`
+                );
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                console.log('[unicode] submit failed:', msg);
+
+                panel.webview.postMessage({
+                    type: 'submitFailed',
+                    courseWorkId: coursework.id,
+                    error: msg
+                });
+
+                vscode.window.showErrorMessage(`Unicode: ${msg}`);
+            }
         }
     });
 

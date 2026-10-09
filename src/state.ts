@@ -13,6 +13,7 @@ export type UserProfile = {
     role: 'Student' | 'Teacher';
     userId: string;
     picture?: string;
+    email: string;
 };
 
 export type GoogleCourse = {
@@ -45,7 +46,14 @@ export function registerMainPanel(panel: vscode.WebviewPanel | undefined) {
 
 export function initUser(context: vscode.ExtensionContext) {
     ctx = context;
-    currentUser = context.globalState.get<UserProfile | null>(USER_KEY, null);
+    const stored = context.globalState.get<UserProfile | null>(USER_KEY, null);
+    if (stored && !stored.email) {
+        // Old record without email — force re-login
+        currentUser = null;
+        context.globalState.update(USER_KEY, undefined);
+    } else {
+        currentUser = stored;
+    }
 }
 
 export function getUser(): UserProfile | null {

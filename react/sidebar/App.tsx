@@ -7,6 +7,8 @@ type UserProfile = {
     name: string;
     role: 'Student' | 'Teacher';
     userId: string;
+    picture?: string;
+    email: string;
 };
 
 export type GoogleCourse = {

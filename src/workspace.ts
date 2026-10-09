@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { GoogleCourse, GoogleCourseWork } from './state';
 import { addLinkedAssignment } from './state';
+import AdmZip from 'adm-zip';
 
 function slugify(input: string): string {
     return input
@@ -176,4 +177,108 @@ async function resolveRootFolder(context: vscode.ExtensionContext): Promise<vsco
 
     await context.globalState.update('unicode.defaultRoot', picked[0].fsPath);
     return picked[0];
+}
+
+const JUNK_DIRS = new Set([
+    'node_modules',
+    'target',
+    'build',
+    'dist',
+    'out',
+    '.git',
+    '.gradle',
+    '.idea',
+    '.vscode',
+    'bin',
+    'obj'
+]);
+
+const SKIP_FILES = new Set([
+    '.unicode.json',
+    'README.md',
+    '.gitignore'
+]);
+
+export type PackagedSubmission = {
+    fileName: string;
+    contentType: string;
+    buffer: Buffer;
+};
+
+export async function packageAssignment(
+    folderPath: string,
+    assignmentTitle: string
+): Promise<PackagedSubmission | null> {
+    const entries = await fs.readdir(folderPath, { withFileTypes: true });
+
+    const realFiles = entries.filter(
+        e => e.isFile() && !SKIP_FILES.has(e.name)
+    );
+
+    const realDirs = entries.filter(
+        e => e.isDirectory() && !JUNK_DIRS.has(e.name)
+    );
+
+    // Single file, no folders → upload raw
+    if (realFiles.length === 1 && realDirs.length === 0) {
+        const file = realFiles[0];
+        const fullPath = path.join(folderPath, file.name);
+        const buffer = await fs.readFile(fullPath);
+
+        return {
+            fileName: file.name,
+            contentType: guessContentType(file.name),
+            buffer
+        };
+    }
+
+    // Nothing to submit
+    if (realFiles.length === 0 && realDirs.length === 0) {
+        return null;
+    }
+
+    // Multiple files or folders → zip
+    const zip = new AdmZip();
+
+    for (const file of realFiles) {
+        zip.addLocalFile(path.join(folderPath, file.name));
+    }
+
+    for (const dir of realDirs) {
+        zip.addLocalFolder(path.join(folderPath, dir.name), dir.name);
+    }
+
+    const safeName = assignmentTitle
+        .replace(/[^a-z0-9]+/gi, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase() || 'submission';
+
+    return {
+        fileName: `${safeName}.zip`,
+        contentType: 'application/zip',
+        buffer: zip.toBuffer()
+    };
+}
+
+function guessContentType(fileName: string): string {
+    const ext = path.extname(fileName).toLowerCase();
+    const map: Record<string, string> = {
+        '.py': 'text/x-python',
+        '.js': 'application/javascript',
+        '.ts': 'application/typescript',
+        '.java': 'text/x-java-source',
+        '.c': 'text/x-c',
+        '.cpp': 'text/x-c++',
+        '.cs': 'text/x-csharp',
+        '.rb': 'text/x-ruby',
+        '.go': 'text/x-go',
+        '.rs': 'text/x-rust',
+        '.php': 'application/x-php',
+        '.html': 'text/html',
+        '.css': 'text/css',
+        '.json': 'application/json',
+        '.md': 'text/markdown',
+        '.txt': 'text/plain'
+    };
+    return map[ext] ?? 'application/octet-stream';
 }

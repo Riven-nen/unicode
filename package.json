@@ -14,11 +14,26 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      { "command": "unicode.startWebview", "title": "Start Webview" },
-      { "command": "unicode.fakeLogin", "title": "debug login" },
-      { "command": "unicode.logout", "title": "logout" },
-      { "command": "unicode.login", "title": "Unicode: Sign In" },
-      { "command": "unicode.debugExpireToken", "title": "Unicode: Debug - Expire Token" }
+      {
+        "command": "unicode.startWebview",
+        "title": "Start Webview"
+      },
+      {
+        "command": "unicode.fakeLogin",
+        "title": "debug login"
+      },
+      {
+        "command": "unicode.logout",
+        "title": "logout"
+      },
+      {
+        "command": "unicode.login",
+        "title": "Unicode: Sign In"
+      },
+      {
+        "command": "unicode.debugExpireToken",
+        "title": "Unicode: Debug - Expire Token"
+      }
     ],
     "viewsContainers": {
       "activitybar": [
@@ -50,6 +65,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/mocha": "^10.0.10",
     "@types/node": "24.x",
     "@types/react": "^19.3.0",
@@ -68,6 +84,7 @@
     "serialize-javascript": "^7.0.6"
   },
   "dependencies": {
+    "adm-zip": "^0.6.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   }

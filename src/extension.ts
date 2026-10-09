@@ -101,6 +101,7 @@ export function activate(context: vscode.ExtensionContext) {
                         role: 'Student',
                         userId: payload.sub,
                         picture: payload.user_metadata?.avatar_url,
+                        email: payload.email ?? '',
                     });
 
                     const courses = await fetchCourses();

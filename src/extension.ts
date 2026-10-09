@@ -7,6 +7,7 @@ import {
     setCurrentCourse, setCoursework, getCourses
 } from './state';
 import { initClassroom, fetchCourses, fetchCoursework } from './classroom';
+import { initAuth, clearAuthSecrets } from './auth';
 
 const SUPABASE_URL = 'https://sgidphfnfrafilphfbha.supabase.co';
 const REDIRECT_URI = 'vscode://rivencode.unicode/auth';
@@ -25,7 +26,15 @@ const SCOPES = [
 export function activate(context: vscode.ExtensionContext) {
     initUser(context);
     initClassroom(context);
+    initAuth(context);
     console.log('[unicode] user on activation:', getUser());
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('unicode.debugExpireToken', async () => {
+            await context.secrets.delete('unicode.googleAccessToken');
+            vscode.window.showInformationMessage('Simulated token expiry — click a course.');
+        })
+    );
 
     const unicodeViewProvider = new UnicodeViewProvider(context);
 
@@ -109,10 +118,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('unicode.logout', async () => {
-            await context.secrets.delete('unicode.accessToken');
-            await context.secrets.delete('unicode.refreshToken');
-            await context.secrets.delete('unicode.googleAccessToken');
-            await context.secrets.delete('unicode.googleRefreshToken');
+            await clearAuthSecrets();
             await setUser(null);
             setCourses([]);
             setCurrentCourse(null);

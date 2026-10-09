@@ -17,7 +17,8 @@
       { "command": "unicode.startWebview", "title": "Start Webview" },
       { "command": "unicode.fakeLogin", "title": "debug login" },
       { "command": "unicode.logout", "title": "logout" },
-      { "command": "unicode.login", "title": "Unicode: Sign In" }
+      { "command": "unicode.login", "title": "Unicode: Sign In" },
+      { "command": "unicode.debugExpireToken", "title": "Unicode: Debug - Expire Token" }
     ],
     "viewsContainers": {
       "activitybar": [

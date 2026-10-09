@@ -53,6 +53,9 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
                 coursework: getCoursework()
             });
         }
+        if (message.type === 'openExternal') {
+            vscode.env.openExternal(vscode.Uri.parse(message.url));
+        }
     });
 
     panel.onDidDispose(() => {

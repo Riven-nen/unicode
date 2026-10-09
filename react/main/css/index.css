@@ -424,6 +424,30 @@ body {
     flex-shrink: 0;
     padding: 16px 32px 20px;
     border-top: 1px solid var(--vscode-panel-border);
+    display: flex;
+    gap: 10px;
+}
+
+.assignment-secondary {
+    padding: 8px 20px;
+    border-radius: 4px;
+    border: 1px solid var(--vscode-button-border, transparent);
+    background: var(--vscode-button-secondaryBackground, transparent);
+    color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.1s ease;
+}
+
+.assignment-secondary:hover:not(:disabled) {
+    background: var(--vscode-button-secondaryHoverBackground, rgba(255,255,255,0.08));
+}
+
+.assignment-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .assignment-primary {

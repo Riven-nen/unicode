@@ -92,3 +92,38 @@ export function setCoursework(coursework: GoogleCourseWork[]) {
     const payload = { type: 'coursework', coursework };
     mainPanel?.webview.postMessage(payload);
 }
+
+export type LinkedAssignment = {
+    courseId: string;
+    courseWorkId: string;
+    folderPath: string;
+    title: string;
+    linkedAt: string;
+};
+
+const ASSIGNMENTS_KEY = 'unicode.assignments';
+
+export function getLinkedAssignments(context: vscode.ExtensionContext): LinkedAssignment[] {
+    return context.globalState.get<LinkedAssignment[]>(ASSIGNMENTS_KEY, []);
+}
+
+export async function addLinkedAssignment(
+    context: vscode.ExtensionContext,
+    entry: LinkedAssignment
+) {
+    const all = getLinkedAssignments(context).filter(
+        a => a.courseWorkId !== entry.courseWorkId
+    );
+    all.push(entry);
+    await context.globalState.update(ASSIGNMENTS_KEY, all);
+}
+
+export async function removeLinkedAssignment(
+    context: vscode.ExtensionContext,
+    courseWorkId: string
+) {
+    const all = getLinkedAssignments(context).filter(
+        a => a.courseWorkId !== courseWorkId
+    );
+    await context.globalState.update(ASSIGNMENTS_KEY, all);
+}

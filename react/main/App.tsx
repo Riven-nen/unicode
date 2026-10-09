@@ -279,11 +279,22 @@ function AssignmentDetail({ coursework, onBack }: AssignmentDetailProps) {
 
             <footer className="assignment-footer">
                 <button
-                    className="assignment-primary"
+                    className="assignment-secondary"
                     onClick={handleOpenInClassroom}
                     disabled={!coursework.alternateLink}
                 >
                     Open in Classroom
+                </button>
+                <button
+                    className="assignment-primary"
+                    onClick={() => {
+                        vscode.postMessage({
+                            type: 'openInWorkspace',
+                            coursework
+                        });
+                    }}
+                >
+                    Open in Workspace
                 </button>
             </footer>
         </div>

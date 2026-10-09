@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { registerMainPanel, getUser, getCurrentCourse, getCoursework } from './state';
+import { openAssignmentInWorkspace } from './workspace';
 
 let unicodePanel: vscode.WebviewPanel | undefined;
 
@@ -35,7 +36,7 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
 
     const panel = unicodePanel;
 
-    panel.webview.onDidReceiveMessage(message => {
+    panel.webview.onDidReceiveMessage(async (message) => {
         if (message.type === 'login') {
             vscode.commands.executeCommand('unicode.login');
         }
@@ -55,6 +56,15 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
         }
         if (message.type === 'openExternal') {
             vscode.env.openExternal(vscode.Uri.parse(message.url));
+        }
+
+        if (message.type === 'openInWorkspace') {
+            const course = getCurrentCourse();
+            if (!course) {
+                vscode.window.showWarningMessage('Unicode: No course is currently open.');
+                return;
+            }
+            await openAssignmentInWorkspace(context, course, message.coursework);
         }
     });
 

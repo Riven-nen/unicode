@@ -211,7 +211,11 @@ export async function submitAssignment(
 
 export type StudentSubmission = {
     id: string;
-    state?: string;
+    state?: 'NEW' | 'CREATED' | 'TURNED_IN' | 'RETURNED' | 'RECLAIMED_BY_STUDENT';
+    late?: boolean;
+    assignedGrade?: number;
+    draftGrade?: number;
+    alternateLink?: string;
 };
 
 type SubmissionsResponse = { studentSubmissions?: StudentSubmission[] };

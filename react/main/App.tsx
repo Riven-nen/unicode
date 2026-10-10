@@ -33,6 +33,15 @@ type GoogleCourseWork = {
     }>;
 };
 
+type StudentSubmission = {
+    id: string;
+    state?: 'NEW' | 'CREATED' | 'TURNED_IN' | 'RETURNED' | 'RECLAIMED_BY_STUDENT';
+    late?: boolean;
+    assignedGrade?: number;
+    draftGrade?: number;
+    alternateLink?: string;
+};
+
 function formatDue(cw: GoogleCourseWork): string {
     if (!cw.dueDate) return 'No due date';
     const { year, month, day } = cw.dueDate;
@@ -160,6 +169,9 @@ function AssignmentDetail({ coursework, onBack }: AssignmentDetailProps) {
     const [submitting, setSubmitting] = useState(false);
     const [progress, setProgress] = useState('');
     const [error, setError] = useState('');
+    const [grade, setGrade] = useState<number | null>(null);
+    const [late, setLate] = useState(false);
+    const [loadingSubmission, setLoadingSubmission] = useState(true);
 
     const handleOpenInClassroom = () => {
         if (coursework.alternateLink) {
@@ -171,8 +183,31 @@ function AssignmentDetail({ coursework, onBack }: AssignmentDetailProps) {
     };
 
     useEffect(() => {
+        vscode.postMessage({
+            type: 'fetchSubmissionState',
+            courseWorkId: coursework.id
+        });
+    }, [coursework.id]);
+
+    useEffect(() => {
         const handler = (event: MessageEvent) => {
             const msg = event.data;
+
+            if (msg.type === 'submissionState' && msg.courseWorkId === coursework.id) {
+                setLoadingSubmission(false);
+                const state = msg.submission?.state;
+                if (state === 'TURNED_IN') {
+                    setSubmitted(true);
+                }
+                if (typeof msg.submission?.assignedGrade === 'number') {
+                    setGrade(msg.submission.assignedGrade);
+                }
+                if (msg.submission?.late) {
+                    setLate(true);
+                }
+                return;
+            }
+
             if (msg.courseWorkId !== coursework.id) return;
 
             if (msg.type === 'submitted') {
@@ -350,9 +385,17 @@ function AssignmentDetail({ coursework, onBack }: AssignmentDetailProps) {
                                 courseWorkId: coursework.id
                             });
                         }}
-                        disabled={submitted || submitting}
+                        disabled={submitted || submitting || loadingSubmission}
                     >
-                        {submitted ? 'Submitted ✓' : submitting ? progress : 'Submit'}
+                        {loadingSubmission
+                            ? 'Loading...'
+                            : submitted
+                            ? grade !== null
+                                ? `Graded: ${grade}${late ? ' (late)' : ''}`
+                                : 'Submitted ✓'
+                            : submitting
+                            ? progress
+                            : 'Submit'}
                     </button>
                 </div>
 

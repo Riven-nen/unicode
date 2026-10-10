@@ -137,12 +137,37 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
                 vscode.window.showErrorMessage(`Unicode: ${msg}`);
             }
         }
+        if (message.type === 'fetchSubmissionState') {
+            const course = getCurrentCourse();
+            if (!course) {
+                panel.webview.postMessage({
+                    type: 'submissionState',
+                    courseWorkId: message.courseWorkId,
+                    submission: null
+                });
+                return;
+            }
+
+            const submission = await fetchSubmission(course.id, message.courseWorkId);
+            panel.webview.postMessage({
+                type: 'submissionState',
+                courseWorkId: message.courseWorkId,
+                submission: submission ?? null
+            });
+        }
     });
 
     panel.onDidDispose(() => {
         registerMainPanel(undefined);
         unicodePanel = undefined;
     });
+
+    panel.iconPath = vscode.Uri.joinPath(
+    context.extensionUri,
+    'media',
+    'pics',
+    'logo-white.svg'
+    );
 
     return unicodePanel;
 }

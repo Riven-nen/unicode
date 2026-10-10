@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-
+import { refreshStatusBar } from './statusBar';
 let currentUser: UserProfile | null = null;
 let currentCourses: GoogleCourse[] = [];
 let currentCourse: GoogleCourse | null = null;
@@ -99,6 +99,14 @@ export function setCoursework(coursework: GoogleCourseWork[]) {
     currentCoursework = coursework;
     const payload = { type: 'coursework', coursework };
     mainPanel?.webview.postMessage(payload);
+
+    // Lazy import to avoid circular dependency at module load
+    try {
+        const { refreshStatusBar } = require('./statusBar');
+        refreshStatusBar();
+    } catch (err) {
+        console.log('[unicode] status bar refresh failed:', err);
+    }
 }
 
 export type LinkedAssignment = {

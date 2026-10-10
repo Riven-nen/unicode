@@ -19,20 +19,12 @@
         "title": "Start Webview"
       },
       {
-        "command": "unicode.fakeLogin",
-        "title": "debug login"
-      },
-      {
         "command": "unicode.logout",
         "title": "logout"
       },
       {
         "command": "unicode.login",
         "title": "Unicode: Sign In"
-      },
-      {
-        "command": "unicode.debugExpireToken",
-        "title": "Unicode: Debug - Expire Token"
       }
     ],
     "viewsContainers": {
@@ -40,7 +32,7 @@
         {
           "id": "unicode-icon",
           "title": "Unicode",
-          "icon": ""
+          "icon": "media/pics/code.svg"
         }
       ]
     },
@@ -50,7 +42,7 @@
           "type": "webview",
           "id": "unicode-main",
           "name": "Unicode",
-          "icon": ""
+          "icon": "media/pics/code.svg"
         }
       ]
     },

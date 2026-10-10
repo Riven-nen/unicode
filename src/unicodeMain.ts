@@ -1,10 +1,19 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { registerMainPanel, getUser, getCurrentCourse, getCoursework, getLinkedAssignments } from './state';
+import {
+    registerMainPanel,
+    getUser,
+    getCurrentCourse,
+    getCoursework,
+    getLinkedAssignments,
+    getCourses,
+    setCourses,
+    setCurrentCourse,
+    setCoursework
+} from './state';
 import { openAssignmentInWorkspace, packageAssignment } from './workspace';
-import {fetchSubmission, submitAssignment} from './classroom';
-
+import { fetchSubmission, submitAssignment, fetchCourses, fetchCoursework } from './classroom';
 
 let unicodePanel: vscode.WebviewPanel | undefined;
 
@@ -19,6 +28,13 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
         'Unicode',
         vscode.ViewColumn.One,
         { enableScripts: true }
+    );
+
+    unicodePanel.iconPath = vscode.Uri.joinPath(
+        context.extensionUri,
+        'media',
+        'pics',
+        'logo-white.svg'
     );
 
     registerMainPanel(unicodePanel);
@@ -42,20 +58,14 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
         if (message.type === 'login') {
             vscode.commands.executeCommand('unicode.login');
         }
+
         if (message.type === 'ready') {
-            panel.webview.postMessage({
-                type: 'authState',
-                user: getUser()
-            });
-            panel.webview.postMessage({
-                type: 'currentCourse',
-                course: getCurrentCourse()
-            });
-            panel.webview.postMessage({
-                type: 'coursework',
-                coursework: getCoursework()
-            });
+            panel.webview.postMessage({ type: 'authState', user: getUser() });
+            panel.webview.postMessage({ type: 'courses', courses: getCourses() });
+            panel.webview.postMessage({ type: 'currentCourse', course: getCurrentCourse() });
+            panel.webview.postMessage({ type: 'coursework', coursework: getCoursework() });
         }
+
         if (message.type === 'openExternal') {
             let url = message.url;
             const user = getUser();
@@ -75,6 +85,41 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
                 return;
             }
             await openAssignmentInWorkspace(context, course, message.coursework);
+        }
+
+        if (message.type === 'refresh') {
+            const course = getCurrentCourse();
+            if (!course) return;
+
+            vscode.window.setStatusBarMessage('Unicode: Refreshing...', 2000);
+
+            const courses = await fetchCourses();
+            setCourses(courses);
+
+            const refreshed = courses.find(c => c.id === course.id) ?? course;
+            setCurrentCourse(refreshed);
+
+            const coursework = await fetchCoursework(refreshed.id);
+            setCoursework(coursework);
+        }
+
+        if (message.type === 'fetchSubmissionState') {
+            const course = getCurrentCourse();
+            if (!course) {
+                panel.webview.postMessage({
+                    type: 'submissionState',
+                    courseWorkId: message.courseWorkId,
+                    submission: null
+                });
+                return;
+            }
+
+            const submission = await fetchSubmission(course.id, message.courseWorkId);
+            panel.webview.postMessage({
+                type: 'submissionState',
+                courseWorkId: message.courseWorkId,
+                submission: submission ?? null
+            });
         }
 
         if (message.type === 'submitAssignment') {
@@ -137,37 +182,12 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
                 vscode.window.showErrorMessage(`Unicode: ${msg}`);
             }
         }
-        if (message.type === 'fetchSubmissionState') {
-            const course = getCurrentCourse();
-            if (!course) {
-                panel.webview.postMessage({
-                    type: 'submissionState',
-                    courseWorkId: message.courseWorkId,
-                    submission: null
-                });
-                return;
-            }
-
-            const submission = await fetchSubmission(course.id, message.courseWorkId);
-            panel.webview.postMessage({
-                type: 'submissionState',
-                courseWorkId: message.courseWorkId,
-                submission: submission ?? null
-            });
-        }
     });
 
     panel.onDidDispose(() => {
         registerMainPanel(undefined);
         unicodePanel = undefined;
     });
-
-    panel.iconPath = vscode.Uri.joinPath(
-    context.extensionUri,
-    'media',
-    'pics',
-    'logo-white.svg'
-    );
 
     return unicodePanel;
 }

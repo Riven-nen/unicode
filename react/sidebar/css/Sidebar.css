@@ -240,3 +240,22 @@ html, body, #root {
     opacity: 0.9;
     flex-shrink: 0;
 }
+
+.sidebar-empty {
+    padding: 20px 14px;
+    text-align: center;
+    color: var(--vscode-descriptionForeground);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.sidebar-empty p {
+    margin: 0;
+}
+
+.sidebar-empty-hint {
+    margin-top: 6px !important;
+    font-size: 11px;
+    opacity: 0.75;
+}
+

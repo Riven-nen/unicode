@@ -530,3 +530,23 @@ body {
     font-size: 14px;
     line-height: 1.4;
 }
+
+.banner-refresh {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.2s ease;
+}
+
+.banner-refresh:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: rotate(180deg);
+}

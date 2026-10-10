@@ -33,15 +33,6 @@ type GoogleCourseWork = {
     }>;
 };
 
-type StudentSubmission = {
-    id: string;
-    state?: 'NEW' | 'CREATED' | 'TURNED_IN' | 'RETURNED' | 'RECLAIMED_BY_STUDENT';
-    late?: boolean;
-    assignedGrade?: number;
-    draftGrade?: number;
-    alternateLink?: string;
-};
-
 function formatDue(cw: GoogleCourseWork): string {
     if (!cw.dueDate) return 'No due date';
     const { year, month, day } = cw.dueDate;
@@ -55,6 +46,7 @@ function App() {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [course, setCourse] = useState<GoogleCourse | null>(null);
     const [coursework, setCoursework] = useState<GoogleCourseWork[]>([]);
+    const [courseCount, setCourseCount] = useState(0);
     const [selectedCoursework, setSelectedCoursework] = useState<GoogleCourseWork | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -72,6 +64,9 @@ function App() {
             if (message.type === 'coursework') {
                 setCoursework(message.coursework);
             }
+            if (message.type === 'courses') {
+                setCourseCount(message.courses.length);
+            }
         };
 
         window.addEventListener('message', handleMessage);
@@ -88,7 +83,11 @@ function App() {
             <div className="main-empty">
                 <div className="main-empty-icon">▤</div>
                 <h2>Unicode</h2>
-                <p>Select a class from the sidebar to view its coursework.</p>
+                {courseCount === 0 ? (
+                    <p>Join a class in Google Classroom to get started.</p>
+                ) : (
+                    <p>Select a class from the sidebar to view its coursework.</p>
+                )}
             </div>
         );
     }
@@ -113,6 +112,15 @@ function App() {
                         </div>
                     )}
                 </div>
+                <button
+                    className="banner-refresh"
+                    onClick={() => {
+                        vscode.postMessage({ type: 'refresh' });
+                    }}
+                    title="Refresh coursework"
+                >
+                    ↻
+                </button>
             </header>
 
             <div className="main-body">

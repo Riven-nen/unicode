@@ -83,26 +83,35 @@ function Sidebar({ courses, user }: SidebarProps) {
                     <span className="sidebar-count">{courses.length}</span>
                 </div>
 
-                <div className="sidebar-subjects">
-                    {courses.map((course) => {
-                        const active = selectedId === course.id;
-                        return (
-                            <button
-                                key={course.id}
-                                className={
-                                    active
-                                        ? 'sidebar-subject active'
-                                        : 'sidebar-subject'
-                                }
-                                style={{ ['--course-color' as any]: courseColor(course.id) }}
-                                onClick={() => handleSubjectClick(course)}
-                            >
-                                <span className="subject-indicator" />
-                                <span className="subject-name">{course.name}</span>
-                            </button>
-                        );
-                    })}
-                </div>
+                {courses.length === 0 ? (
+                    <div className="sidebar-empty">
+                        <p>No classes yet.</p>
+                        <p className="sidebar-empty-hint">
+                            Join a class in Google Classroom to see it here.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="sidebar-subjects">
+                        {courses.map((course) => {
+                            const active = selectedId === course.id;
+                            return (
+                                <button
+                                    key={course.id}
+                                    className={
+                                        active
+                                            ? 'sidebar-subject active'
+                                            : 'sidebar-subject'
+                                    }
+                                    style={{ ['--course-color' as any]: courseColor(course.id) }}
+                                    onClick={() => handleSubjectClick(course)}
+                                >
+                                    <span className="subject-indicator" />
+                                    <span className="subject-name">{course.name}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
 
             <div className="sidebar-footer">

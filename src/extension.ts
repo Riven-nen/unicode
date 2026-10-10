@@ -9,7 +9,7 @@ import {
 import { initClassroom, fetchCourses, fetchCoursework } from './classroom';
 import { initAuth, clearAuthSecrets } from './auth';
 import { initStatusBar } from './statusBar';
-
+import { checkDeadlineNotifications } from './notifications';
 const SUPABASE_URL = 'https://sgidphfnfrafilphfbha.supabase.co';
 const REDIRECT_URI = 'vscode://rivencode.unicode/auth';
 
@@ -29,6 +29,13 @@ export function activate(context: vscode.ExtensionContext) {
     initClassroom(context);
     initAuth(context);
     initStatusBar(context);
+    const deadlineInterval = setInterval(
+        () => checkDeadlineNotifications(context),
+        15 * 60 * 1000
+    );
+    context.subscriptions.push({ dispose: () => clearInterval(deadlineInterval) });
+
+    setTimeout(() => checkDeadlineNotifications(context), 5000);
     console.log('[unicode] user on activation:', getUser());
 
     const unicodeViewProvider = new UnicodeViewProvider(context);

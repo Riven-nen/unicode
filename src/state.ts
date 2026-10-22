@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import { refreshStatusBar } from './statusBar';
+
 let currentUser: UserProfile | null = null;
 let currentCourses: GoogleCourse[] = [];
 let currentCourse: GoogleCourse | null = null;
 let currentCoursework: GoogleCourseWork[] = [];
+let currentSelectedCoursework: GoogleCourseWork | null = null;
 let sidebarView: vscode.WebviewView | undefined;
 let mainPanel: vscode.WebviewPanel | undefined;
 let ctx: vscode.ExtensionContext | undefined;
@@ -48,7 +50,6 @@ export function initUser(context: vscode.ExtensionContext) {
     ctx = context;
     const stored = context.globalState.get<UserProfile | null>(USER_KEY, null);
     if (stored && !stored.email) {
-        // Old record without email — force re-login
         currentUser = null;
         context.globalState.update(USER_KEY, undefined);
     } else {
@@ -86,9 +87,15 @@ export function getCurrentCourse(): GoogleCourse | null {
 
 export function setCurrentCourse(course: GoogleCourse | null) {
     currentCourse = course;
+    // Switching courses clears the selected coursework
+    currentSelectedCoursework = null;
     const payload = { type: 'currentCourse', course };
     sidebarView?.webview.postMessage(payload);
     mainPanel?.webview.postMessage(payload);
+    mainPanel?.webview.postMessage({
+        type: 'selectedCoursework',
+        coursework: null
+    });
 }
 
 export function getCoursework(): GoogleCourseWork[] {
@@ -100,13 +107,24 @@ export function setCoursework(coursework: GoogleCourseWork[]) {
     const payload = { type: 'coursework', coursework };
     mainPanel?.webview.postMessage(payload);
 
-    // Lazy import to avoid circular dependency at module load
     try {
         const { refreshStatusBar } = require('./statusBar');
         refreshStatusBar();
     } catch (err) {
         console.log('[unicode] status bar refresh failed:', err);
     }
+}
+
+export function getSelectedCoursework(): GoogleCourseWork | null {
+    return currentSelectedCoursework;
+}
+
+export function setSelectedCoursework(cw: GoogleCourseWork | null) {
+    currentSelectedCoursework = cw;
+    mainPanel?.webview.postMessage({
+        type: 'selectedCoursework',
+        coursework: cw
+    });
 }
 
 export type LinkedAssignment = {

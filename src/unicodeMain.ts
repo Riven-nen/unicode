@@ -10,7 +10,9 @@ import {
     getCourses,
     setCourses,
     setCurrentCourse,
-    setCoursework
+    setCoursework,
+    getSelectedCoursework,
+    setSelectedCoursework
 } from './state';
 import { openAssignmentInWorkspace, packageAssignment } from './workspace';
 import { fetchSubmission, submitAssignment, fetchCourses, fetchCoursework } from './classroom';
@@ -64,6 +66,18 @@ export function createUnicodeWebview(context: vscode.ExtensionContext) {
             panel.webview.postMessage({ type: 'courses', courses: getCourses() });
             panel.webview.postMessage({ type: 'currentCourse', course: getCurrentCourse() });
             panel.webview.postMessage({ type: 'coursework', coursework: getCoursework() });
+            panel.webview.postMessage({
+                type: 'selectedCoursework',
+                coursework: getSelectedCoursework()
+            });
+        }
+
+        if (message.type === 'selectCoursework') {
+            setSelectedCoursework(message.coursework);
+        }
+
+        if (message.type === 'clearSelectedCoursework') {
+            setSelectedCoursework(null);
         }
 
         if (message.type === 'openExternal') {

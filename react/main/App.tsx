@@ -67,6 +67,9 @@ function App() {
             if (message.type === 'courses') {
                 setCourseCount(message.courses.length);
             }
+            if (message.type === 'selectedCoursework') {
+                setSelectedCoursework(message.coursework);
+            }
         };
 
         window.addEventListener('message', handleMessage);
@@ -96,7 +99,10 @@ function App() {
         return (
             <AssignmentDetail
                 coursework={selectedCoursework}
-                onBack={() => setSelectedCoursework(null)}
+                onBack={() => {
+                    setSelectedCoursework(null);
+                    vscode.postMessage({ type: 'clearSelectedCoursework' });
+                }}
             />
         );
     }
@@ -139,7 +145,13 @@ function App() {
                             <li
                                 key={cw.id}
                                 className="coursework-item"
-                                onClick={() => setSelectedCoursework(cw)}
+                                onClick={() => {
+                                    setSelectedCoursework(cw);
+                                    vscode.postMessage({
+                                        type: 'selectCoursework',
+                                        coursework: cw
+                                    });
+                                }}
                             >
                                 <div className="coursework-icon">▤</div>
                                 <div className="coursework-body">
